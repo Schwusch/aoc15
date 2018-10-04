@@ -16,6 +16,7 @@ fun main(args: Array<String>) {
     day8()
     day9()
     day10()
+    day11()
 }
 
 fun lines(num: Int) = File("./src/AoC15/input/day$num.txt").readLines()
@@ -312,4 +313,55 @@ fun day10() {
 
     println("40 iterations is ${doTheThing(40)} long")
     println("50 iterations is ${doTheThing(50)} long")
+}
+
+fun day11() {
+    println("\nDay 11:")
+    val input = "cqjxjnds".reversed()
+    val a = 'a'.toByte().toInt()
+    val z = 'z'.toByte().toInt()
+    val i = 'i'.toByte().toInt()
+    val o = 'o'.toByte().toInt()
+    val l = 'l'.toByte().toInt()
+
+    val asNumbers = input.map { it.toByte().toInt() }.toMutableList()
+
+    fun Int.increment(): Pair<Int, Boolean> = if (this >= z) a to true else this + 1 to false
+
+    fun MutableList<Int>.increment() {
+        var ret = 0 to true
+        var index = 0
+        while (ret.second) {
+            ret = this[index].increment()
+            this[index] = ret.first
+            index++
+        }
+    }
+
+    fun MutableList<Int>.containsBadLetters(): Boolean = contains(i) || contains(o) || contains(l)
+    fun MutableList<Int>.containsConsecutive(): Boolean = windowed(size = 3).any { it[0] == it[1] + 1 && it[1] == it[2] + 1 }
+    fun MutableList<Int>.containspairs(): Boolean {
+        val windows = windowed(size = 2)
+        windows.forEachIndexed { index, nuffra ->
+            if (windows.filterIndexed { ind, i -> (ind > index + 1 || index - 1 > ind) && nuffra.first() == nuffra.last() && i.first() == i.last() }.isNotEmpty())
+                return true
+        }
+        return false
+    }
+
+    fun findNext() {
+        var notOk = true
+        while (notOk) {
+            with(asNumbers) {
+                increment()
+                if (containsBadLetters().not() && containsConsecutive() && containspairs())
+                    notOk = false
+            }
+        }
+    }
+
+    findNext()
+    println("new password is ${String(asNumbers.reversed().map { it.toByte() }.toByteArray())}")
+    findNext()
+    println("password after that is ${String(asNumbers.reversed().map { it.toByte() }.toByteArray())}")
 }
