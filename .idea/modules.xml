@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AdventOfCode.iml" filepath="$PROJECT_DIR$/AdventOfCode.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/aoc15.iml" filepath="$PROJECT_DIR$/.idea/aoc15.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/aoc15_main.iml" filepath="$PROJECT_DIR$/.idea/modules/aoc15_main.iml" group="aoc15" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/aoc15_test.iml" filepath="$PROJECT_DIR$/.idea/modules/aoc15_test.iml" group="aoc15" />
     </modules>
   </component>
 </project>

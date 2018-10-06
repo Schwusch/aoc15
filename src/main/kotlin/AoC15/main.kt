@@ -1,11 +1,17 @@
 package AoC15
 
+import com.beust.klaxon.JsonArray
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Parser
 import java.io.File
 import java.lang.Exception
 import java.security.MessageDigest
 import javax.xml.bind.DatatypeConverter
+import kotlin.math.max
+import kotlin.math.min
 
 fun main(args: Array<String>) {
+    /*
     day1()
     day2()
     day3()
@@ -17,9 +23,13 @@ fun main(args: Array<String>) {
     day9()
     day10()
     day11()
+    day12()
+    day13()
+    */
+    day14()
 }
 
-fun lines(num: Int) = File("./src/AoC15/input/day$num.txt").readLines()
+fun lines(num: Int) = File("./src/main/kotlin/AoC15/input/day$num.txt").readLines()
 
 fun day1() {
     println("\nDay 1:")
@@ -364,4 +374,79 @@ fun day11() {
     println("new password is ${String(asNumbers.reversed().map { it.toByte() }.toByteArray())}")
     findNext()
     println("password after that is ${String(asNumbers.reversed().map { it.toByte() }.toByteArray())}")
+}
+
+fun day12() {
+    println("\nDay 12:")
+    val json = Parser().parse("./src/main/kotlin/AoC15/input/day12.txt") as JsonObject
+
+    var redOrNo = false
+
+    fun traverse(obj: Any): Int {
+        return when(obj) {
+            is JsonObject -> if (obj.values.any { it == "red" } && redOrNo) 0 else obj.values.map { traverse(it!!) }.sum()
+            is Int -> obj
+            is JsonArray<*> -> obj.map { traverse(it!!) }.sum()
+            else -> 0
+        }
+    }
+
+    println(traverse(json))
+    redOrNo = true
+    println(traverse(json))
+}
+
+fun day13() {
+    println("\nDay 13:")
+    val guests = mutableSetOf<String>()
+    val seatings = mutableMapOf<Pair<String, String>, Int>()
+
+    lines(13).forEach { line ->
+        val parts = line.split(" ")
+        val points = when(parts[2]) {
+            "gain" -> { parts[3].toInt() }
+            else -> { -parts[3].toInt() }
+        }
+        val guest1 = parts.first()
+        val guest2 = parts.last().dropLast(1)
+        guests.addAll(listOf(guest1, guest2))
+        seatings[guest1 to guest2] = points
+    }
+
+    fun maximumHappiness(guests: List<String>): Int = Permutations(guests.size).mapIndexed { index, conf ->
+        val sum = conf.zipWithNext().sumBy { (seatings[guests[it.first] to guests[it.second]] ?: 0) + (seatings[guests[it.second] to guests[it.first]] ?: 0) }
+        sum + (seatings[guests[conf.first()] to guests[conf.last()]] ?: 0) + (seatings[guests[conf.last()] to guests[conf.first()]] ?: 0)
+    }.max()!!
+
+    println("max change in happiness is ${maximumHappiness(guests.toList())}")
+    println("max change in happiness, me included, is ${maximumHappiness(guests.apply { add("me") }.toList())}")
+}
+
+fun day14() {
+    println("\nDay 14:")
+    data class ReinDeer(val speed: Int, val flying: Int, val resting: Int, val name: String)
+
+    val reindeers = lines(14).map { line -> line.split(" ").let { parts -> ReinDeer(parts[3].toInt(), parts[6].toInt(), parts[13].toInt(), parts.first())} }
+
+    val seconds = 2503
+
+    fun getDistances(second: Int) = reindeers.map {
+        val x = second / (it.flying + it.resting)
+        val y = second % (it.flying + it.resting)
+        (x * it.flying * it.speed + min(y, it.flying) * it.speed)
+    }
+
+    val points = MutableList(size = reindeers.size, init = {0})
+    for (second in 1 until seconds) {
+        getDistances(second).let {
+            val max = it.max()
+            it.forEachIndexed { index, i ->
+                if (i == max) points[index] = points[index] + 1
+            }
+        }
+    }
+
+    println("distance: ${getDistances(seconds).max()}")
+    println("most points: ${points.max()}")
+
 }
