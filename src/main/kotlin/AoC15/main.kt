@@ -580,22 +580,46 @@ class Days {
 
     fun day18() {
         println("\nDay 18:")
-        val input = """.#.#.#
-...##.
-#....#
-..#...
-#.#..#
-####..""".lines().map { it.map { when(it) {
+        var input = lines(18).map { it.map { when(it) {
             '#' -> 1
             else -> 0
-        }}}
+        }}.toMutableList()}
+        var temp = List(size = input.size) { MutableList(size = input.first().size){0}}
 
-        for(i in 0 until 4) {
-            for (x in 0 until input.size) {
-                for (y in 0 until input.first().size) {
-                    // TODO
+        fun List<List<Int>>.get(x: Int, y: Int): Int = getOrNull(x)?.getOrNull(y) ?: 0
+        var second = false
+        fun doDaThang(){
+            for(i in 0 until 100) {
+                for (x in 0 until input.size) {
+                    for (y in 0 until input.first().size) {
+                        with(input) {
+                            val on = input[x][y] == 1
+                            val sum = get(x+1,y)+get(x-1,y)+get(x,y+1)+get(x,y-1)+get(x-1, y-1)+get(x-1,y+1)+get(x+1,y-1)+get(x+1,y+1)
+                            temp[x][y] = when {
+                                second && (x == 0 || x == input.size - 1) && (y == 0 || y == input.first().size - 1) -> 1
+                                on && sum in 2..3 || on.not() && sum == 3 -> 1
+                                else -> 0
+                            }
+                        }
+                    }
                 }
+                val temp2 = input
+                input = temp
+                temp = temp2
             }
         }
+        doDaThang()
+        println("Part One: ${input.sumBy { it.sum() }}")
+        input = lines(18).map { it.map { when(it) {
+            '#' -> 1
+            else -> 0
+        }}.toMutableList()}
+        input[0][0] = 1
+        input[0][input.size-1] = 1
+        input[input.size-1][0] = 1
+        input[input.size-1][input.size-1] = 1
+        second = true
+        doDaThang()
+        println("Part Two: ${input.sumBy { it.sum() }}")
     }
 }
