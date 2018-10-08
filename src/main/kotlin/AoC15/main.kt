@@ -312,7 +312,6 @@ class Days {
         }
 
         val dests = destinations.toList()
-
         val tjuhu = Permutations(dests.size).map { conf ->
             conf.zipWithNext().sumBy { routes[dests[it.first] to dests[it.second]]!! }
         }
@@ -358,15 +357,10 @@ class Days {
     fun day11() {
         println("\nDay 11:")
         val input = "cqjxjnds".reversed()
-        val a = 'a'.toByte().toInt()
-        val z = 'z'.toByte().toInt()
-        val i = 'i'.toByte().toInt()
-        val o = 'o'.toByte().toInt()
-        val l = 'l'.toByte().toInt()
 
         val asNumbers = input.map { it.toByte().toInt() }.toMutableList()
 
-        fun Int.increment(): Pair<Int, Boolean> = if (this >= z) a to true else this + 1 to false
+        fun Int.increment(): Pair<Int, Boolean> = if (this >= 'z'.toByte().toInt()) 'a'.toByte().toInt() to true else this + 1 to false
 
         fun MutableList<Int>.increment() {
             var ret = 0 to true
@@ -378,10 +372,8 @@ class Days {
             }
         }
 
-        fun MutableList<Int>.containsBadLetters(): Boolean = contains(i) || contains(o) || contains(l)
-        fun MutableList<Int>.containsConsecutive(): Boolean =
-            windowed(size = 3).any { it[0] == it[1] + 1 && it[1] == it[2] + 1 }
-
+        fun MutableList<Int>.containsBadLetters(): Boolean = contains('i'.toByte().toInt()) || contains('o'.toByte().toInt()) || contains('l'.toByte().toInt())
+        fun MutableList<Int>.containsConsecutive(): Boolean = windowed(size = 3).any { it[0] == it[1] + 1 && it[1] == it[2] + 1 }
         fun MutableList<Int>.containspairs(): Boolean {
             val windows = windowed(size = 2)
             windows.forEachIndexed { index, nuffra ->
@@ -411,7 +403,6 @@ class Days {
     fun day12() {
         println("\nDay 12:")
         val json = Parser().parse("./src/main/kotlin/AoC15/input/day12.txt") as JsonObject
-
         var redOrNo = false
 
         fun traverse(obj: Any): Int {
@@ -495,24 +486,14 @@ class Days {
 
     fun day15() {
         println("\nDay 15:")
-        data class Ingredient(
-            val name: String,
-            val capacity: Int,
-            val durability: Int,
-            val flavor: Int,
-            val texture: Int,
-            val calories: Int
-        )
+        data class Ingredient(val capacity: Int, val durability: Int, val flavor: Int, val texture: Int, val calories: Int)
 
-        val ingredients = listOf(
-            Ingredient("Sprinkles", 2, 0, -2, 0, 3),
-            Ingredient("Butterscotch", 0, 5, -3, 0, 3),
-            Ingredient("Chocolate", 0, 0, 5, -1, 8),
-            Ingredient("Candy", 0, -1, 0, 5, 8)
-        )
+        val ingredients = listOf(Ingredient(2, 0, -2, 0, 3),
+            Ingredient( 0, 5, -3, 0, 3),
+            Ingredient( 0, 0, 5, -1, 8),
+            Ingredient(0, -1, 0, 5, 8))
 
-        fun sum(comb: List<Pair<Ingredient, Int>>, maxCal: Boolean): Int {
-            return (max(0, comb.sumBy { (ingredient, amount) ->
+        fun sum(comb: List<Pair<Ingredient, Int>>, maxCal: Boolean): Int = (max(0, comb.sumBy { (ingredient, amount) ->
                 ingredient.capacity * amount
             }) * max(0, comb.sumBy { (ingredient, amount) ->
                 ingredient.durability * amount
@@ -521,7 +502,7 @@ class Days {
             }) * max(0, comb.sumBy { (ingredient, amount) ->
                 ingredient.texture * amount
             })) * if (maxCal && comb.sumBy { (i, a) -> i.calories * a } != 500) 0 else 1
-        }
+
 
         var max = 0
         var maxCal = 0
